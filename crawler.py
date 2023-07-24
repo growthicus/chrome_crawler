@@ -79,5 +79,5 @@ class CrawlThread(threading.Thread):
         logging.info(f"THREAD ENDED: {self.url}")
 
 
-c = Crawler(start_url="https://aerius.se/")
-c.start()
+#c = Crawler(start_url="https://example.com/")
+#c.start()
