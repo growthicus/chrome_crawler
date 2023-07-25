@@ -16,7 +16,7 @@ class Tag:
 @dataclass
 class Extractor(ABC):
     url: str
-    soup: BeautifulSoup
+    soup: Union[BeautifulSoup, Any] = None
     result: Union[defaultdict[dict], dict] = field(
         default_factory=lambda: defaultdict(dict)
     )
@@ -29,7 +29,7 @@ class Extractor(ABC):
                 tags.append((str_tag, real_tag))
         return tags
 
-    def extract(self, html: str) -> None:
+    def extract(self) -> None:
         tags = self.get_tags()
         for tag in tags:
             str_tag: str = tag[0]
