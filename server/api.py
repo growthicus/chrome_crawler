@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request  # type: ignore
 from dataclasses import dataclass
 from chrome import chrome_driver  # type: ignore
 

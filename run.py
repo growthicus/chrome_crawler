@@ -1,13 +1,13 @@
 from crawler import Crawler
 from settings import CrawerSettings, ServerSettings
-from extractors import SeoData
+import extractors
 
 c = Crawler(
     server_settings=ServerSettings(),
     crawler_settings=CrawerSettings(
         start_url="https://www.stadium.se/sport/golf",
         url_contain=["golf"],
-        extractor=SeoData,
+        extractor=extractors.OnlyTitle,
     ),
 )
 c.start()
