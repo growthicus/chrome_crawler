@@ -5,6 +5,7 @@ from urllib.parse import urljoin, urlparse
 from queue import Queue
 import logging
 import requests  # type: ignore
+import extractors
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -53,24 +54,32 @@ class CrawlThread(threading.Thread):
         self.urls = urls
         self.semp = semp
         self.driver = chrome_driver()
+        self.html = self.render_page()
+        self.soup = BeautifulSoup(self.html, "html.parser")
+        self.data = extractors.SeoData(url=url, soup=self.soup)
 
     def render_page(self) -> str:
         r = requests.post("http://127.0.0.1:5000/render", json={"url": self.url})
         return r.text
 
-    def get_links(self, page_source):
-        soup = BeautifulSoup(self.render_page(), "html.parser")
-        links = [urljoin(self.url, link.get("href")) for link in soup.find_all("a")]
+    def get_links(self):
+        links = [
+            urljoin(self.url, link.get("href")) for link in self.soup.find_all("a")
+        ]
         return links
 
+    def extract(self, html: str):
+        self.data.extract(html)
+
     def run(self):
-        logging.info(f"THREAD STARTED: {self.url}")
+        logging.info(f"THREAD STARTED!: {self.url}")
         # Get page source
         page_source = self.render_page()
-        # Get elements
-        # self.get_elements(pagesource)
+        # Extract data
+        self.extract(html=page_source)
+        logging.info(f"Am data {self.data.jsonify()}")
         # Get all links
-        for url in self.get_links(page_source):
+        for url in self.get_links():
             self.urls.put(url)
 
         self.semp.release()
@@ -79,5 +88,5 @@ class CrawlThread(threading.Thread):
         logging.info(f"THREAD ENDED: {self.url}")
 
 
-#c = Crawler(start_url="https://example.com/")
-#c.start()
+# c = Crawler(start_url="https://stadium.se")
+# c.start()
