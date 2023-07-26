@@ -5,6 +5,7 @@ Simple threaded crawler using headless chrome to render pages through a small fl
 ## Installation
 
 1. Git clone this repo
-2. Build docker image in server folder
-3. Run docker image
-4. Run the crawler
+2. sudo docker-compose up --build
+3. Send request to crawler API to start crawling 
+   - See Makefile for example post (make post_crawler)
+     - See CrawlerSettings in settings.py

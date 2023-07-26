@@ -4,7 +4,7 @@ from urllib.parse import urljoin, urlparse
 from queue import Queue
 import logging
 import requests  # type: ignore
-from settings import CrawerSettings, ServerSettings  # type: ignore
+from settings import CrawlerSettings, ServerSettings  # type: ignore
 from extractors.extractor import Extractor  # type: ignore
 
 logging.basicConfig()
@@ -14,9 +14,13 @@ logging.getLogger().setLevel(logging.INFO)
 class Crawler:
     def __init__(
         self,
-        crawler_settings: CrawerSettings,
+        start_url: str,
+        crawler_settings: CrawlerSettings,
         server_settings: ServerSettings,
+        extractor: Extractor,
     ):
+        self.start_url = start_url
+        self.extractor = extractor
         self.crawler_settings = crawler_settings
         self.server_settings = server_settings
         self.api_timeout: int = crawler_settings.api_timeout
@@ -26,10 +30,13 @@ class Crawler:
         self.crawled_urls: list[str] = []
 
     def start(self):
-        self.urls.put(self.crawler_settings.start_url)
+        self.urls.put(self.start_url)
         while True:
             url = self.urls.get()
-            if self.crawler_settings.validate_url(url):
+            if (
+                self.crawler_settings.validate_url(url, start_url=self.start_url)
+                and url not in self.crawled_urls
+            ):
                 self.crawled_urls.append(url)
                 self.semaphore.acquire()
                 thread = CrawlThread(
@@ -37,7 +44,7 @@ class Crawler:
                     urls=self.urls,
                     semp=self.semaphore,
                     server_settings=self.server_settings,
-                    extractor=self.crawler_settings.extractor,
+                    extractor=self.extractor,
                 )
                 thread.start()
 
@@ -66,6 +73,8 @@ class CrawlThread(threading.Thread):
     def render_page(self) -> str:
         api_url = f"{ServerSettings.host}:{ServerSettings.port}"
         r = requests.post(f"{api_url}/render", json={"url": self.url})
+        if r.status_code != 200:
+            raise Exception("Failed to connect to chrome server")
         return r.text
 
     def get_links(self):
@@ -77,7 +86,7 @@ class CrawlThread(threading.Thread):
     def run(self):
         # Extract data
         self.extractor.extract(soup=self.soup)
-        logging.info(f"Am data {self.extractor.jsonify()}")
+        logging.info(self.extractor.jsonify())
         # Get all links
         for url in self.get_links():
             self.urls.put(url)
