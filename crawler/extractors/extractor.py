@@ -40,7 +40,7 @@ class Extractor(ABC):
         self.result["url"] = self.url
         self.result = dict(self.result)
 
-    def _parser(self, elems: list, str_tag: str, attr: str):
+    def _parser(self, elems: list, str_tag: str, attr: str) -> None:
         if attr == "text":
             data = [elem.text for elem in elems if elem.text != ""]
         else:
@@ -48,7 +48,7 @@ class Extractor(ABC):
 
         self.result[str_tag][attr] = data
 
-    def jsonify(self):
+    def jsonify(self) -> str:
         return json.dumps(
             self.result,
             sort_keys=True,

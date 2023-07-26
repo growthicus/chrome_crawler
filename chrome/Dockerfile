@@ -1,11 +1,11 @@
 # Using official Python base image
-FROM python:3.11
+FROM python:3.11-slim-buster
 
 # Set the working directory to /app
-WORKDIR /app
+WORKDIR /chrome
 
 # Copy the requirements.txt into the container
-COPY requirements.txt /app
+COPY requirements.txt /chrome
 
 # Update and install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -43,7 +43,7 @@ RUN wget -N http://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.s
 ENV DISPLAY=:99
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY . /chrome
 
 # Run the application
 CMD ["gunicorn", "api:app", "-w", "4", "-k", "gevent", "--bind", "0.0.0.0:5000"]

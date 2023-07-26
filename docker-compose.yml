@@ -1,0 +1,17 @@
+version: '3'
+services:
+  server:
+    build: 
+      context: ./chrome
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    command: gunicorn api:app -w 4 -k gevent --bind 0.0.0.0:5000
+
+  crawler:
+    build: 
+      context: ./crawler
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+    command: gunicorn api:app -w 4 -k gevent --bind 0.0.0.0:5000
