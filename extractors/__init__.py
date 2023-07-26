@@ -7,3 +7,8 @@ class SeoData(Extractor):
     h1 = Tag(tag="h1")
     h2 = Tag(tag="h2")
     a = Tag(tag="a", attr=["href", "text"])
+
+
+@dataclass
+class OnlyTitle(Extractor):
+    title = Tag(tag="title")

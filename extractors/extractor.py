@@ -16,7 +16,6 @@ class Tag:
 @dataclass
 class Extractor(ABC):
     url: str
-    soup: Union[BeautifulSoup, Any] = None
     result: Union[defaultdict[dict], dict] = field(
         default_factory=lambda: defaultdict(dict)
     )
@@ -29,17 +28,16 @@ class Extractor(ABC):
                 tags.append((str_tag, real_tag))
         return tags
 
-    def extract(self) -> None:
+    def extract(self, soup: BeautifulSoup) -> None:
         tags = self.get_tags()
         for tag in tags:
             str_tag: str = tag[0]
             real_tag: Tag = tag[1]
             for attr in real_tag.attr:
-                elems = self.soup.find_all(str_tag)
+                elems = soup.find_all(str_tag)
                 self._parser(elems=elems, str_tag=str_tag, attr=attr)
 
-        # Reset soup to save mem
-        self.soup = None
+        self.result["url"] = self.url
         self.result = dict(self.result)
 
     def _parser(self, elems: list, str_tag: str, attr: str):

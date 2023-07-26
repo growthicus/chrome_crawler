@@ -61,7 +61,7 @@ class CrawlThread(threading.Thread):
         self.semp = semp
         self.html = self.render_page()
         self.soup = BeautifulSoup(self.html, "html.parser")
-        self.extractor = extractor(url=url)
+        self.extractor: Extractor = extractor(url=url)
 
     def render_page(self) -> str:
         api_url = f"{ServerSettings.host}:{ServerSettings.port}"
@@ -76,8 +76,7 @@ class CrawlThread(threading.Thread):
 
     def run(self):
         # Extract data
-        self.extractor.soup = self.soup
-        self.extractor.extract()
+        self.extractor.extract(soup=self.soup)
         logging.info(f"Am data {self.extractor.jsonify()}")
         # Get all links
         for url in self.get_links():
