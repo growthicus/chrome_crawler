@@ -4,8 +4,8 @@ from urllib.parse import urljoin, urlparse
 from queue import Queue
 import logging
 import requests  # type: ignore
-from settings import CrawerSettings, ServerSettings
-from extractors.extractor import Extractor
+from settings import CrawerSettings, ServerSettings  # type: ignore
+from extractors.extractor import Extractor  # type: ignore
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)

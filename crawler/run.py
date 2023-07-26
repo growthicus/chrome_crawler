@@ -1,5 +1,5 @@
-from crawler import Crawler
-from settings import CrawerSettings, ServerSettings
+from crawler.crawler import Crawler
+from crawler.settings import CrawerSettings, ServerSettings
 import extractors
 
 c = Crawler(
