@@ -1,9 +1,12 @@
 from flask import Flask, request  # type: ignore
 from dataclasses import dataclass, field
 from crawler import Crawler, CrawlerSettings, ServerSettings
-import json
 import importlib
 import threading
+import logging
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 app = Flask(__name__)
 
@@ -32,7 +35,15 @@ def crawler_start(req: CrawlRequest):
 
 @app.route("/start", methods=["POST"])
 def endpoint_start():
+    logging.info(f"crawler/start: {request.json}")
     req = CrawlRequest(**request.json)
     t = threading.Thread(target=crawler_start, args=(req,))
     t.start()
+    return request.json
+
+
+@app.route("/report", methods=["POST"])
+def crawler_report():
+    logging.info(f"crawler/report: {request.json}")
+
     return request.json
