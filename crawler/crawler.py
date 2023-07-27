@@ -71,10 +71,8 @@ class CrawlThread(threading.Thread):
         return links
 
     def run(self):
-        # Extract data
         self.t_extractor.extract(soup=self.to_soup())
         logging.info(self.t_extractor.jsonify())
-        # Get all links
         for url in self.get_links():
             if (
                 self.cls.crawler_settings.validate_url(url=url)
