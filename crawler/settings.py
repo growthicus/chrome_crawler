@@ -3,10 +3,87 @@ import tldextract
 from typing import Union
 
 
+non_html_extensions = [
+    # Image files
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".bmp",
+    ".svg",
+    ".webp",
+    ".ico",
+    # Video files
+    ".mp4",
+    ".avi",
+    ".mov",
+    ".flv",
+    ".wmv",
+    ".webm",
+    # Audio files
+    ".mp3",
+    ".wav",
+    ".ogg",
+    ".flac",
+    ".m4a",
+    # Document files
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".ppt",
+    ".pptx",
+    ".xls",
+    ".xlsx",
+    ".odt",
+    ".ods",
+    ".odp",
+    ".txt",
+    ".rtf",
+    # Archive files
+    ".zip",
+    ".rar",
+    ".7z",
+    ".tar",
+    ".gz",
+    ".bz2",
+    # Code and script files
+    ".js",
+    ".css",
+    ".py",
+    ".rb",
+    ".java",
+    ".c",
+    ".cpp",
+    # Database files
+    ".sql",
+    ".db",
+    ".mdb",
+    # Font files
+    ".ttf",
+    ".otf",
+    ".woff",
+    ".woff2",
+    # Binary and executable files
+    ".exe",
+    ".bin",
+    ".dll",
+    ".so",
+    ".dmg",
+    # Miscellaneous file types
+    ".xml",
+    ".json",
+    ".csv",
+    ".tsv",
+    ".log",
+]
+
+
 @dataclass
 class ServerSettings:
-    host: str = "http://chrome"
-    port: str = "5000"
+    chrome_host: str = "http://chrome"
+    chrome_port: str = "5000"
+    reciever_host: Union[str, None] = None
+    reciever_port: Union[str, None] = None
 
 
 @dataclass
@@ -36,5 +113,8 @@ class CrawlerSettings:
         if self.url_contain:
             if not any(p in url for p in self.url_contain):
                 return False
+
+        if any(f in url for f in non_html_extensions):
+            return False
 
         return True

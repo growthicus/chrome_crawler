@@ -1,6 +1,10 @@
 from flask import Flask, request  # type: ignore
 from dataclasses import dataclass
 from chrome import chrome_driver  # type: ignore
+import logging
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 
 app = Flask(__name__)
 
@@ -20,6 +24,7 @@ def chrome_render(req: RenderRequest) -> str:
 
 @app.route("/render", methods=["POST"])
 def render():
+    logging.info(f"chrome/render: {request.json}")
     req = RenderRequest(**request.json)
     html = chrome_render(req=req)
     return html
