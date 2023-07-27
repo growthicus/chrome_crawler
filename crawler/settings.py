@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import tldextract
-from extractors.extractor import Extractor  # type: ignore
+from typing import Union
 
 
 @dataclass
@@ -11,6 +11,7 @@ class ServerSettings:
 
 @dataclass
 class CrawlerSettings:
+    start_url: Union[str, None] = None
     max_threads: int = 10
     api_timeout: int = 10
     url_not_contain: list[str] = field(default_factory=lambda: [])
@@ -18,8 +19,8 @@ class CrawlerSettings:
     url_tld_match: bool = True
     subdomains: bool = False
 
-    def validate_url(self, url: str, start_url: str):
-        org_tld = tldextract.extract(start_url)
+    def validate_url(self, url: str):
+        org_tld = tldextract.extract(self.start_url)
         tld = tldextract.extract(url)
         if self.url_tld_match:
             if org_tld.domain != tld.domain or org_tld.suffix != tld.suffix:
