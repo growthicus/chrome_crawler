@@ -24,7 +24,8 @@ class CrawlerSettings:
         if self.url_tld_match:
             if org_tld.domain != tld.domain or org_tld.suffix != tld.suffix:
                 return False
-        if self.subdomains:
+
+        if not self.subdomains:
             if org_tld.subdomain != tld.subdomain:
                 return False
 
