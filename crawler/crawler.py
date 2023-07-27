@@ -30,9 +30,10 @@ class Crawler:
 
     def start(self):
         self.crawler_settings.start_url = self.start_url
+        self.crawled_urls.append(self.start_url)
         self.urls.put(self.start_url)
         while True:
-            url = self.urls.get()
+            url = self.urls.get(timeout=30)
             self.semaphore.acquire()
             thread = CrawlThread(url=url, cls=self)
             thread.start()
@@ -79,8 +80,6 @@ class CrawlThread(threading.Thread):
 
     def run(self) -> None:
         self.t_extractor.extract(soup=self.to_soup())
-        self.render_page.cache_clear()
-        self.to_soup.cache_clear()
 
         for url in self.get_links():
             if (
@@ -89,6 +88,9 @@ class CrawlThread(threading.Thread):
             ):
                 self.cls.crawled_urls.append(url)
                 self.cls.urls.put(url)
+
+        self.render_page.cache_clear()
+        self.to_soup.cache_clear()
 
         self.process_result()
         self.cls.semaphore.release()

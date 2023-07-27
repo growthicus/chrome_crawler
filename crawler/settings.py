@@ -97,14 +97,24 @@ class CrawlerSettings:
     subdomains: bool = False
 
     def validate_url(self, url: str):
+        # Always let first URL through
+        if self.start_url == url:
+            return True
+
         org_tld = tldextract.extract(self.start_url)
         tld = tldextract.extract(url)
         if self.url_tld_match:
             if org_tld.domain != tld.domain or org_tld.suffix != tld.suffix:
                 return False
 
+        # example.com == www.example.com
+        # dont consider www as subdomain
         if not self.subdomains:
-            if org_tld.subdomain != tld.subdomain:
+            if not org_tld.subdomain and tld.subdomain == "www":
+                pass
+            elif not tld.subdomain and org_tld.subdomain == "www":
+                pass
+            else:
                 return False
 
         if any(p in url for p in self.url_not_contain):
