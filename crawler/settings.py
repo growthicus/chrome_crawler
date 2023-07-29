@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import tldextract
 from typing import Union
-
+import logging
 
 non_html_extensions = [
     # Image files
@@ -82,8 +82,8 @@ non_html_extensions = [
 class ServerSettings:
     chrome_host: str = "http://chrome"
     chrome_port: str = "5000"
-    reciever_host: Union[str, None] = None
-    reciever_port: Union[str, None] = None
+    mq_host: str = "queue"
+    mq_port: str = "5672"
 
 
 @dataclass
@@ -108,8 +108,8 @@ class CrawlerSettings:
                 return False
 
         # example.com == www.example.com
-        # dont consider www as subdomain
-        if not self.subdomains:
+        # dont consider www and '' as different subdomains
+        if not self.subdomains and org_tld.subdomain != tld.subdomain:
             if not org_tld.subdomain and tld.subdomain == "www":
                 pass
             elif not tld.subdomain and org_tld.subdomain == "www":
