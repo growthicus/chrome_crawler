@@ -15,3 +15,16 @@ services:
     ports:
       - "5001:5000"
     command: gunicorn api:app -w 4 -k gevent --bind 0.0.0.0:5000
+    depends_on:
+      - queue
+
+  queue:
+    build:
+      context: ./rabbitMQ
+      dockerfile: Dockerfile
+    ports:
+      - "5672:5672" # standard port
+      - "15672:15672" # browser-based UI
+      #- "1883:1883"
+      #- "61613:61613"
+# EXPOSE 5672 15672 1883 61613

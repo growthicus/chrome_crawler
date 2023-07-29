@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from bs4 import BeautifulSoup  # type: ignore
 from typing import Union, Any
 from abc import ABC
@@ -16,6 +16,7 @@ class Tag:
 @dataclass
 class Extractor(ABC):
     url: str
+    _id: str
     result: Union[defaultdict[dict], dict] = field(
         default_factory=lambda: defaultdict(dict)
     )
@@ -37,7 +38,6 @@ class Extractor(ABC):
                 elems = soup.find_all(str_tag)
                 self._parser(elems=elems, str_tag=str_tag, attr=attr)
 
-        self.result["url"] = self.url
         self.result = dict(self.result)
 
     def _parser(self, elems: list, str_tag: str, attr: str) -> None:
@@ -50,7 +50,7 @@ class Extractor(ABC):
 
     def jsonify(self) -> str:
         return json.dumps(
-            self.result,
+            asdict(self),
             sort_keys=True,
             indent=4,
             separators=(",", ": "),

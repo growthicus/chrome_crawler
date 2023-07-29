@@ -20,10 +20,16 @@ class CrawlRequest:
     extractor: str = "example"
 
 
+@dataclass
+class StopRequest:
+    crawl_id: str
+
+
 def crawler_start(req: CrawlRequest):
     extractor = importlib.import_module(f"extractors.{req.extractor}")
 
     crawler = Crawler(
+        _id=req.crawl_id,
         start_url=req.url,
         extractor=extractor.Data,
         crawler_settings=CrawlerSettings(**req.crawler_settings),
@@ -42,8 +48,9 @@ def endpoint_start():
     return request.json
 
 
-@app.route("/report", methods=["POST"])
-def crawler_report():
-    logging.info(f"crawler/report: {request.json}")
+@app.route("/stop", methods=["POST"])
+def endpoint_stop():
+    logging.info(f"crawler/stop: {request.json}")
+    req = StopRequest(**request.json)
 
     return request.json
