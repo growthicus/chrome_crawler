@@ -31,13 +31,6 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome WebDriver
-RUN wget -N http://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip -P ~/ \
-    && unzip ~/chromedriver_linux64.zip -d ~/ \
-    && rm ~/chromedriver_linux64.zip \
-    && mv -f ~/chromedriver /usr/local/share/ \
-    && chmod +x /usr/local/share/chromedriver \
-    && ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
 
 # Set display port as an environment variable
 ENV DISPLAY=:99
