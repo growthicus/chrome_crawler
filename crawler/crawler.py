@@ -9,6 +9,8 @@ from settings import CrawlerSettings, ServerSettings  # type: ignore
 from extractors.extractor import Extractor  # type: ignore
 from functools import lru_cache
 import pika  # type: ignore
+from lxml import etree
+import time
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -98,6 +100,9 @@ class CrawlThread(threading.Thread):
     def to_soup(self) -> BeautifulSoup:
         return BeautifulSoup(self.render_page(), "html.parser")
 
+    def to_dom(self, soup: BeautifulSoup):
+        return etree.HTML(str(soup))
+
     @lru_cache(maxsize=None)
     def render_page(self) -> str:
         chrome_api = f"{self.chrome_host}:{self.chrome_port}"
@@ -107,7 +112,7 @@ class CrawlThread(threading.Thread):
             timeout=self.cls.crawler_settings.api_timeout,
         )
         if r.status_code != 200:
-            raise Exception("Failed to connect to chrome server")
+            raise Exception(f"Failed to connect to chrome server: {r.text}")
         return r.text
 
     def process_result(self):
@@ -120,7 +125,7 @@ class CrawlThread(threading.Thread):
         return links
 
     def run(self) -> None:
-        self.t_extractor.extract(soup=self.to_soup())
+        self.t_extractor.extract(dom=self.to_dom(soup=self.to_soup()))
 
         for url in self.get_links():
             if (
@@ -134,4 +139,5 @@ class CrawlThread(threading.Thread):
         self.to_soup.cache_clear()
 
         self.process_result()
+        time.sleep(4)
         self.cls.semaphore.release()
