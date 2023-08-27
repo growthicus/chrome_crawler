@@ -50,10 +50,16 @@ class Extractor(ABC):
         self.result[str_tag][attr] = data
 
     def jsonify(self) -> str:
-        return json.dumps(
-            asdict(self),
-            sort_keys=True,
-            indent=4,
-            separators=(",", ": "),
-            ensure_ascii=False,
-        )
+        if self.result:
+            try:
+                return json.dumps(
+                    asdict(self),
+                    sort_keys=True,
+                    indent=4,
+                    separators=(",", ": "),
+                    ensure_ascii=False,
+                )
+            except TypeError as e:
+                raise Exception(f"Could not convert {self.result} to json")
+        else:
+            return json.dumps({"msg": "no result", "url": self.url})
