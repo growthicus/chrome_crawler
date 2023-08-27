@@ -91,20 +91,31 @@ class CrawlerSettings:
     start_url: Union[str, None] = None
     max_threads: int = 10
     api_timeout: int = 10
-    url_not_contain: list[str] = field(default_factory=lambda: [])
-    url_contain: list[str] = field(default_factory=lambda: [])
+    follow_url_not_contain: list[str] = field(default_factory=lambda: [])
+    follow_url_contain: list[str] = field(default_factory=lambda: [])
+    extract_url_not_contain: list[str] = field(default_factory=lambda: [])
+    extract_url_contain: list[str] = field(default_factory=lambda: [])
+
     url_tld_match: bool = True
     subdomains: bool = False
 
-    def validate_url(self, url: str):
+    def validate_url(self, url: str, task="follow"):
         # Always let first URL through
         if self.start_url == url:
             return True
+
+        if task == "follow":
+            contain = self.follow_url_contain
+            not_contain = self.follow_url_not_contain
+        else:
+            contain = self.extract_url_contain
+            not_contain = self.extract_url_not_contain
 
         org_tld = tldextract.extract(self.start_url)
         tld = tldextract.extract(url)
         if self.url_tld_match:
             if org_tld.domain != tld.domain or org_tld.suffix != tld.suffix:
+                logging.warning(f"{url} false 1")
                 return False
 
         # example.com == www.example.com
@@ -115,13 +126,16 @@ class CrawlerSettings:
             elif not tld.subdomain and org_tld.subdomain == "www":
                 pass
             else:
+                logging.warning(f"{url} false 2")
                 return False
 
-        if any(p in url for p in self.url_not_contain):
+        if any(p in url for p in not_contain):
+            logging.warning(f"{url} did contain {contain} - {task}")
             return False
 
-        if self.url_contain:
-            if not any(p in url for p in self.url_contain):
+        if contain:
+            if not any(p in url for p in contain):
+                logging.warning(f"{url} did not contain {contain} - {task}")
                 return False
 
         if any(f in url for f in non_html_extensions):
