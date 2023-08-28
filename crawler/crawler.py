@@ -64,8 +64,7 @@ class Crawler:
 
     def start_queue(self):
         while True:
-            time.sleep(5)
-
+            time.sleep(self.crawler_settings.thread_sleep)
             try:
                 url = self.urls.get(timeout=15)
                 self.semaphore.acquire()
@@ -129,6 +128,7 @@ class CrawlThread(threading.Thread):
     def run(self) -> None:
         if self.cls.crawler_settings.validate_url(url=self.url, task="extract"):
             self.t_extractor.extract(dom=self.to_dom(soup=self.to_soup()))
+            self.process_result()
 
         for url in self.get_links():
             if url not in self.cls.crawled_urls:
@@ -139,6 +139,4 @@ class CrawlThread(threading.Thread):
 
         self.render_page.cache_clear()
         self.to_soup.cache_clear()
-
-        self.process_result()
         self.cls.semaphore.release()
