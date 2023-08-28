@@ -91,6 +91,7 @@ class CrawlerSettings:
     start_url: Union[str, None] = None
     max_threads: int = 10
     api_timeout: int = 10
+    thread_sleep: int = 3
     follow_url_not_contain: list[str] = field(default_factory=lambda: [])
     follow_url_contain: list[str] = field(default_factory=lambda: [])
     extract_url_not_contain: list[str] = field(default_factory=lambda: [])

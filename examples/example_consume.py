@@ -2,6 +2,19 @@ import pika, sys, os
 import json
 
 
+# function to add to JSON
+def write_json(new_data, filename="data.json"):
+    with open(filename, "r+") as file:
+        # First we load existing data into a dict.
+        file_data = json.load(file)
+        # Join new_data with file_data inside emp_details
+        file_data["data"].append(new_data)
+        # Sets file's current position at offset.
+        file.seek(0)
+        # convert back to json.
+        json.dump(file_data, file, indent=4)
+
+
 def main():
     connection = pika.BlockingConnection(pika.ConnectionParameters(host="localhost"))
     channel = connection.channel()
@@ -9,7 +22,9 @@ def main():
     channel.queue_declare(queue="asd123")
 
     def callback(ch, method, properties, body):
-        print(json.loads(body))
+        data = json.loads(body)
+        write_json(new_data=data)
+        print(data)
 
     channel.basic_consume(queue="asd123", on_message_callback=callback, auto_ack=True)
 

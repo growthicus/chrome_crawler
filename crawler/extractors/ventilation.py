@@ -12,15 +12,15 @@ class Data(Extractor):
         tag="title",
         xpath="/html/body/div[2]/div[1]/div/div[2]/div[2]/div[4]/div[1]/div[3]/main/div[1]/div/div[2]/div[1]/h1",
     )
-    desc = Tag(
+    desc1 = Tag(
         tag="desc1",
         xpath="/html/body/div[2]/div[1]/div/div[2]/div[2]/div[4]/div[1]/div[3]/main/div[1]/div/div[2]/div[3]/div/div[1]/div[2]/p[2]",
     )
-    desc = Tag(
+    desc2 = Tag(
         tag="desc2",
         xpath="/html/body/div[2]/div[1]/div/div[2]/div[2]/div[4]/div[1]/div[3]/main/div[1]/div/div[2]/div[3]/div/div[1]/div[2]/p[3]",
     )
-    desc = Tag(
+    desc3 = Tag(
         tag="desc3",
         xpath="/html/body/div[2]/div[1]/div/div[2]/div[2]/div[4]/div[1]/div[3]/main/div[1]/div/div[2]/div[3]/div/div[1]/div[2]/p[4]",
     )
@@ -28,3 +28,5 @@ class Data(Extractor):
         tag="brand",
         xpath="/html/body/div[2]/div[1]/div/div[2]/div[2]/div[4]/div[1]/div[3]/main/div[1]/div/div[2]/div[1]/div/ul/li/a",
     )
+
+    img = Tag(tag="brand", xpath='//*[@id="CurrentProductImage"]', attr=["href"])
